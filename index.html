@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flag Locker – Inventory</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Flag Locker">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a3d9c">
+<meta name="description" content="Inventory for national flags and International Code of Signals flags">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f5f9;--card:#fff;--tx:#14213d;--mut:#667089;--ln:#dde2ec;--ac:#0a3d9c;--acf:#fff;--warn:#b45309;--warnbg:#fef3c7;--bad:#b91c1c;--badbg:#fee2e2;--ok:#166534;--okbg:#dcfce7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0c1220;--card:#162036;--tx:#e8edf7;--mut:#93a0bb;--ln:#26324d;--ac:#6ea0ff;--acf:#0c1220;--warn:#fbbf24;--warnbg:#3a2c0c;--bad:#fca5a5;--badbg:#3b1616;--ok:#86efac;--okbg:#10301c}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0c1220;--card:#162036;--tx:#e8edf7;--mut:#93a0bb;--ln:#26324d;--ac:#6ea0ff;--acf:#0c1220;--warn:#fbbf24;--warnbg:#3a2c0c;--bad:#fca5a5;--badbg:#3b1616;--ok:#86efac;--okbg:#10301c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:640px;margin:0 auto;padding-bottom:90px}
+header{padding:14px 16px 6px;display:flex;align-items:center;justify-content:space-between}
+h1{font-size:20px;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.ghost{background:none;border:1px solid var(--ln);border-radius:10px;padding:6px 10px;color:var(--tx)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 16px}
+.stat{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:8px 10px}
+.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--mut)}
+.tabs{display:flex;gap:6px;padding:8px 16px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.tabs button{flex:1;padding:10px;border-radius:12px;border:1px solid var(--ln);background:var(--card);font-weight:600}
+.tabs button.on{background:var(--ac);color:var(--acf);border-color:var(--ac)}
+.tools{padding:0 16px 6px}
+.tools input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--ln);background:var(--card)}
+.chips{display:flex;gap:6px;margin-top:8px;overflow-x:auto}
+.chips button{border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:5px 12px;white-space:nowrap}
+.chips button.on{border-color:var(--ac);color:var(--ac);font-weight:600}
+h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:16px 16px 6px}
+.list{padding:0 16px;display:grid;gap:8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:10px;cursor:pointer}
+.ico{width:54px;flex:none;display:flex;justify-content:center;align-items:center;font-size:34px;line-height:1}
+.fl{width:54px;height:36px;border-radius:3px;box-shadow:0 0 0 1px rgba(128,128,128,.35)}
+.info{flex:1;min-width:0}
+.nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;font-size:11px;font-weight:600;border-radius:6px;padding:1px 6px;margin-right:4px}
+.b-low{background:var(--warnbg);color:var(--warn)}.b-none{background:var(--badbg);color:var(--bad)}.b-ok{background:var(--okbg);color:var(--ok)}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:34px;height:34px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);font-size:18px}
+.step span{min-width:22px;text-align:center;font-weight:700}
+.ph{width:54px;height:54px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 1px rgba(128,128,128,.35)}.steps{display:grid;gap:4px}.tot{font-size:12px;color:var(--mut);text-align:right;border-top:1px solid var(--ln);padding-top:3px}.tot b{color:var(--tx);font-size:14px}.step i{font-style:normal;font-weight:700;width:14px}.k-good{color:var(--ok)}.k-bad{color:var(--bad)}.step button{width:30px;height:30px}.phbox{display:flex;gap:10px;align-items:center}.phv{width:84px;height:84px;border-radius:10px;border:1px dashed var(--ln);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--mut);overflow:hidden;flex:none;text-align:center}.phv img{width:100%;height:100%;object-fit:cover}.phb{display:grid;gap:6px}
+.fab{position:fixed;right:max(16px,calc(50% - 304px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;border:0;background:var(--ac);color:var(--acf);font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.empty{text-align:center;color:var(--mut);padding:30px 16px}
+.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheetbg.show{display:flex}
+.sheet{background:var(--card);width:100%;max-width:640px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet h3{margin:0 0 10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+.sheet input,.sheet select,.sheet textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ln);background:var(--bg)}
+.acts{display:flex;gap:8px;margin-top:14px}
+.acts button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--ln);background:var(--bg);font-weight:600}
+.acts .pri{background:var(--ac);color:var(--acf);border-color:var(--ac)}
+.acts .del{color:var(--bad)}
+.note{font-size:12px;color:var(--mut);padding:14px 16px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<clipPath id="sw"><path d="M0 0H60L46 20L60 40H0Z"/></clipPath>
+<clipPath id="pn"><path d="M0 4L60 20L0 36Z"/></clipPath></defs></svg>
+<header><h1>⚓ Flag Locker</h1><div><button class="ghost" id="exp">Export to Excel</button></div></header>
+<div class="stats" id="stats"></div>
+<div class="tabs"><button id="t-national">National flags</button><button id="t-signal">Signal flags</button></div>
+<div class="tools"><input id="q" type="search" placeholder="Search name, code or location"><div class="chips" id="chips"></div></div>
+<div id="out"></div>
+<p class="note">Your inventory and photos are saved on this device only. Signal flag artwork is simplified; verify against the official International Code of Signals before ordering.</p>
+<button class="fab" id="add" aria-label="Add flag">+</button>
+<div class="sheetbg" id="sbg"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const C={R:'#d9261c',B:'#0a3d9c',Y:'#fcd116',W:'#fff',K:'#111'};
+const r=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+const sw=s=>`<g clip-path="url(#sw)">${s}</g>`;
+const poly=(p,c)=>`<polygon points="${p}" fill="${c}"/>`;
+const hs=(cs)=>cs.map((c,i)=>r(0,i*40/cs.length,60,40/cs.length+.3,C[c])).join('');
+const vs=(cs)=>cs.map((c,i)=>r(i*60/cs.length,0,60/cs.length+.3,40,C[c])).join('');
+const X=(c)=>`<path d="M0 0L60 40M60 0L0 40" stroke="${c}" stroke-width="8"/>`;
+const F={
+A:sw(r(0,0,30,40,C.W)+r(30,0,30,40,C.B)),B:sw(r(0,0,60,40,C.R)),
+C:hs(['B','W','R','W','B']),D:r(0,0,60,40,C.Y)+r(0,10,60,20,C.B),E:hs(['B','R']),
+F:r(0,0,60,40,C.W)+poly('30,4 54,20 30,36 6,20',C.R),G:vs(['Y','B','Y','B','Y','B']),
+H:vs(['W','R']),I:r(0,0,60,40,C.Y)+`<circle cx="30" cy="20" r="11" fill="${C.K}"/>`,J:hs(['B','W','B']),K:vs(['Y','B']),
+L:r(0,0,30,20,C.Y)+r(30,0,30,20,C.K)+r(0,20,30,20,C.K)+r(30,20,30,20,C.Y),
+M:r(0,0,60,40,C.B)+X(C.W),
+N:Array.from({length:16},(_,i)=>r((i%4)*15,Math.floor(i/4)*10,15,10,(i%4+Math.floor(i/4))%2?C.W:C.B)).join(''),
+O:r(0,0,60,40,C.Y)+poly('60,0 60,40 0,40',C.R),P:r(0,0,60,40,C.B)+r(15,10,30,20,C.W),Q:r(0,0,60,40,C.Y),
+R:r(0,0,60,40,C.R)+r(0,16,60,8,C.Y)+r(26,0,8,40,C.Y),S:r(0,0,60,40,C.W)+r(15,10,30,20,C.B),T:vs(['R','W','B']),
+U:r(0,0,30,20,C.R)+r(30,0,30,20,C.W)+r(0,20,30,20,C.W)+r(30,20,30,20,C.R),
+V:r(0,0,60,40,C.W)+X(C.R),W:r(0,0,60,40,C.B)+r(8,5,44,30,C.W)+r(18,12,24,16,C.R),
+X:r(0,0,60,40,C.W)+r(0,15,60,10,C.B)+r(25,0,10,40,C.B),
+Y:r(0,0,60,40,C.Y)+[0,1,2,3,4].map(i=>`<path d="M${i*16-20} 45L${i*16+10} -5" stroke="${C.R}" stroke-width="8"/>`).join(''),
+Z:poly('0,0 60,0 30,20',C.Y)+poly('0,0 30,20 0,40',C.B)+poly('60,0 60,40 30,20',C.R)+poly('0,40 60,40 30,20',C.K)};
+const MEAN={A:'Diver down; keep well clear',B:'Dangerous goods being handled',C:'Yes / affirmative',D:'Keep clear; manoeuvring with difficulty',E:'Altering course to starboard',F:'I am disabled; communicate with me',G:'I require a pilot',H:'Pilot on board',I:'Altering course to port',J:'On fire with dangerous cargo; keep clear',K:'I wish to communicate with you',L:'Stop your vessel instantly',M:'My vessel is stopped',N:'No / negative',O:'Man overboard',P:'All persons report on board; about to sail',Q:'My vessel is healthy; free pratique',R:'No single-flag meaning in current ICS',S:'My engines are going astern',T:'Keep clear; pair trawling',U:'You are running into danger',V:'I require assistance',W:'I require medical assistance',X:'Stop your intentions; watch for my signals',Y:'I am dragging my anchor',Z:'I require a tug'};
+const NAMES='Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliet Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Yankee Zulu'.split(' ');
+const CTRY='US United States|GB United Kingdom|CA Canada|AU Australia|NZ New Zealand|IE Ireland|FR France|DE Germany|IT Italy|ES Spain|PT Portugal|NL Netherlands|BE Belgium|CH Switzerland|AT Austria|SE Sweden|NO Norway|DK Denmark|FI Finland|IS Iceland|PL Poland|CZ Czechia|GR Greece|TR Türkiye|RU Russia|UA Ukraine|CN China|JP Japan|KR South Korea|IN India|PK Pakistan|ID Indonesia|PH Philippines|VN Vietnam|TH Thailand|MY Malaysia|SG Singapore|SA Saudi Arabia|AE United Arab Emirates|IL Israel|EG Egypt|ZA South Africa|NG Nigeria|KE Kenya|MA Morocco|BR Brazil|AR Argentina|MX Mexico|CL Chile|CO Colombia|PE Peru|CU Cuba|JM Jamaica|HR Croatia|MT Malta|CY Cyprus|EE Estonia|LV Latvia|LT Lithuania|HU Hungary|RO Romania|UN United Nations|EU European Union'.split('|');
+
+const KEY='flagLockerV1';
+const base={good:0,bad:0,qty:0,par:1,size:'',mat:'',photo:'',loc:'',notes:''};
+function seed(){
+  const a=[];
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((c,i)=>a.push({...base,id:'s'+c,cat:'signal',g:'Alphabet flags',code:c,name:`${c} – ${NAMES[i]}`,meaning:MEAN[c]}));
+  for(let i=0;i<10;i++)a.push({...base,id:'n'+i,cat:'signal',g:'Numeral pennants',code:String(i),name:`Pennant ${i}`,meaning:'Numeral '+i});
+  [1,2,3].forEach(i=>a.push({...base,id:'x'+i,cat:'signal',g:'Substitutes & answer',code:'S'+i,name:`Substitute ${i}`,meaning:'Repeats the '+['first','second','third'][i-1]+' flag of the hoist'}));
+  a.push({...base,id:'xap',cat:'signal',g:'Substitutes & answer',code:'AP',name:'Code / Answer pennant',meaning:'Answer; decimal point; code signal in use'});
+  CTRY.forEach(s=>{const c=s.slice(0,2);a.push({...base,id:'c'+c,cat:'national',par:0,code:c,name:s.slice(3)})});
+  return a;
+}
+let items;
+try{items=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){items=null}
+if(!Array.isArray(items)||!items.length)items=seed();
+items.forEach(i=>{if(i.good==null){const b=['Worn','Needs repair'].includes(i.cond);i.good=b?0:(i.qty||0);i.bad=b?(i.qty||0):0}i.qty=i.good+i.bad;if(i.photo==null)i.photo=''});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){const n=document.querySelector('.note');if(n)n.textContent='Could not save: browser storage is full. Remove some photos.'}};
+function shrink(f){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const s=Math.min(1,320/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.65))};im.src=fr.result};fr.readAsDataURL(f)})}
+let tab='national',chip='all',q='',editing=null,delArm=false,curPhoto='';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const emoji=c=>/^[A-Za-z]{2}$/.test(c||'')?String.fromCodePoint(...c.toUpperCase().split('').map(x=>127397+x.charCodeAt(0))):'🏳️';
+function icon(it){
+  if(it.photo)return `<img class="ph" src="${it.photo}" alt="">`;
+  if(it.cat==='national')return `<span style="font-size:34px">${emoji(it.code)}</span>`;
+  const c=it.code;
+  if(F[c])return `<svg class="fl" viewBox="0 0 60 40">${F[c]}</svg>`;
+  const t=(s)=>`<text x="${s}" y="25" font-size="14" font-weight="700" text-anchor="middle" fill="#111" font-family="system-ui">`;
+  if(c==='AP')return `<svg class="fl" viewBox="0 0 60 40"><g clip-path="url(#pn)">${[0,1,2,3,4].map(i=>r(i*12,0,12.3,40,i%2?C.W:C.R)).join('')}</g></svg>`;
+  if(c[0]==='S')return `<svg class="fl" viewBox="0 0 60 40"><polygon points="30,2 58,38 2,38" fill="#e5e7eb" stroke="#888"/>${t(30)}${c[1]}</text></svg>`;
+  return `<svg class="fl" viewBox="0 0 60 40"><polygon points="0,4 60,20 0,36" fill="#e5e7eb" stroke="#888"/>${t(18)}${c}</text></svg>`;
+}
+const status=it=>it.qty<=0?['none','None']:it.good===0?['low','Bad only']:it.good<it.par?['low','Low']:['ok','OK'];
+function stats(){
+  const L=items.filter(i=>i.cat===tab),have=L.filter(i=>i.qty>0).length,g=L.reduce((s,i)=>s+i.good,0),b=L.reduce((s,i)=>s+i.bad,0),low=L.filter(i=>i.good<i.par).length;
+  $('#stats').innerHTML=`<div class="stat"><b>${have}/${L.length}</b><span>${tab==='signal'?'Set complete':'Types owned'}</span></div><div class="stat"><b>${g} <small style="color:var(--bad)">/ ${b}</small></b><span>Good / bad</span></div><div class="stat"><b>${low}</b><span>Below par</span></div>`;
+}
+function card(it){
+  const [k,l]=status(it);
+  const sub=[it.size,it.mat,it.loc].filter(Boolean).join(' · ')||it.meaning||'';
+  return `<div class="item" data-id="${it.id}"><div class="ico">${icon(it)}</div><div class="info"><div class="nm">${esc(it.name)}</div><div class="sub"><span class="badge b-${k}">${l}</span>${esc(sub)}</div></div><div class="steps">${['good','bad'].map(k=>`<div class="step"><i class="k-${k}">${k==='good'?'✓':'✗'}</i><button data-k="${k}" data-d="-1" aria-label="Remove one ${k}">−</button><span>${it[k]}</span><button data-k="${k}" data-d="1" aria-label="Add one ${k}">+</button></div>`).join('')}<div class="tot">Total <b>${it.qty}</b></div></div></div>`;
+}
+function render(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.id==='t-'+tab));
+  $('#chips').innerHTML=[['all','All'],['in','In stock'],['low','Out / low']].map(([k,l])=>`<button data-k="${k}" class="${chip===k?'on':''}">${l}</button>`).join('');
+  stats();
+  let L=items.filter(i=>i.cat===tab);
+  const s=q.trim().toLowerCase();
+  if(s)L=L.filter(i=>[i.name,i.code,i.loc,i.meaning].join(' ').toLowerCase().includes(s));
+  if(chip==='in')L=L.filter(i=>i.qty>0);
+  if(chip==='low')L=L.filter(i=>i.good<i.par||i.good===0);
+  if(!L.length){$('#out').innerHTML='<div class="empty">No flags match.</div>';return}
+  if(tab==='national'){L.sort((a,b)=>a.name.localeCompare(b.name));$('#out').innerHTML=`<div class="list" style="margin-top:6px">${L.map(card).join('')}</div>`;return}
+  const gs=[...new Set(L.map(i=>i.g||'Other'))];
+  $('#out').innerHTML=gs.map(g=>`<h2>${g}</h2><div class="list">${L.filter(i=>(i.g||'Other')===g).map(card).join('')}</div>`).join('');
+}
+$('#out').addEventListener('click',e=>{
+  const el=e.target.closest('.item');if(!el)return;
+  const it=items.find(i=>i.id===el.dataset.id),b=e.target.closest('button[data-d]');
+  if(b){const k=b.dataset.k;it[k]=Math.max(0,it[k]+ +b.dataset.d);it.qty=it.good+it.bad;save();render();return}
+  openEdit(it);
+});
+$('#chips').addEventListener('click',e=>{const b=e.target.closest('button');if(b){chip=b.dataset.k;render()}});
+$('#q').addEventListener('input',e=>{q=e.target.value;render()});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.id.slice(2);render()});
+$('#add').onclick=()=>openEdit(null);
+$('#sbg').addEventListener('click',e=>{if(e.target.id==='sbg')closeSheet()});
+const closeSheet=()=>{$('#sbg').classList.remove('show');editing=null;delArm=false};
+const opt=(arr,v)=>arr.map(o=>`<option${o===v?' selected':''}>${o}</option>`).join('');
+function openEdit(it){
+  editing=it;delArm=false;
+  const n=it||{...base,cat:tab,code:'',name:'',par:tab==='national'?0:1};
+  $('#sheet').innerHTML=`<h3>${it?esc(it.name):'Add a flag'}</h3>
+  ${it?'':`<label>Type</label><select id="f-cat"><option value="national"${tab==='national'?' selected':''}>National / other flag</option><option value="signal"${tab==='signal'?' selected':''}>Signal flag</option></select>
+  <div class="row"><div><label>Name</label><input id="f-name"></div><div><label>2-letter country code (for icon)</label><input id="f-code" maxlength="2" placeholder="e.g. FR"></div></div>`}
+  <label>Photo</label><div class="phbox"><div id="f-phv" class="phv">${n.photo?`<img src="${n.photo}" alt="">`:'No photo'}</div><div class="phb"><button type="button" class="ghost" id="f-phb">Take / choose photo</button><button type="button" class="ghost" id="f-phx">Remove</button><input id="f-file" type="file" accept="image/*" hidden></div></div>
+  <div class="row"><div><label>Good condition</label><input id="f-good" type="number" min="0" value="${n.good}"></div><div><label>Bad / needs replacing</label><input id="f-bad" type="number" min="0" value="${n.bad}"></div></div>
+  <div class="row"><div><label>Size</label><input id="f-size" list="sizes" value="${esc(n.size)}"></div><div><label>Material</label><input id="f-mat" list="mats" value="${esc(n.mat)}"></div></div>
+  <div class="row"><div><label>Par level (min. good)</label><input id="f-par" type="number" min="0" value="${n.par}"></div><div><label>Location</label><input id="f-loc" value="${esc(n.loc)}" placeholder="Locker, bin, shelf…"></div></div>
+  <label>Notes</label><textarea id="f-notes" rows="2">${esc(n.notes)}</textarea>
+  <datalist id="sizes"><option>2x3 ft</option><option>3x5 ft</option><option>4x6 ft</option><option>5x8 ft</option><option>6x10 ft</option><option>Small</option><option>Medium</option><option>Large</option></datalist>
+  <datalist id="mats"><option>Nylon</option><option>Polyester</option><option>Cotton</option><option>Bunting</option></datalist>
+  <div class="acts">${it?'<button class="del" id="f-del">Delete</button>':''}<button id="f-x">Cancel</button><button class="pri" id="f-ok">Save</button></div>`;
+  $('#sbg').classList.add('show');
+  $('#f-x').onclick=closeSheet;
+  curPhoto=n.photo||'';
+  $('#f-phb').onclick=()=>$('#f-file').click();
+  $('#f-phx').onclick=()=>{curPhoto='';$('#f-phv').textContent='No photo'};
+  $('#f-file').onchange=e=>{const f=e.target.files[0];if(!f)return;shrink(f).then(d=>{curPhoto=d;$('#f-phv').innerHTML='<img src="'+d+'" alt="">'}).catch(()=>{$('#f-phv').textContent='Could not read image'})};
+  if(it)$('#f-del').onclick=e=>{if(!delArm){delArm=true;e.target.textContent='Tap again to delete';return}items=items.filter(i=>i!==it);save();closeSheet();render()};
+  $('#f-ok').onclick=()=>{
+    const v=id=>$('#f-'+id).value;
+    const o=it||{id:'u'+Date.now(),g:'Custom'};
+    if(!it){const name=v('name').trim();if(!name){$('#f-name').focus();return}o.name=name;o.code=v('code').trim().toUpperCase();o.cat=v('cat');if(o.cat==='signal')o.g='Custom';items.push(o);tab=o.cat}
+    Object.assign(o,{good:Math.max(0,parseInt(v('good'))||0),bad:Math.max(0,parseInt(v('bad'))||0),photo:curPhoto,par:Math.max(0,parseInt(v('par'))||0),size:v('size').trim(),mat:v('mat').trim(),loc:v('loc').trim(),notes:v('notes').trim()});o.qty=o.good+o.bad;
+    save();closeSheet();render();
+  };
+}
+$('#exp').onclick=()=>{
+  const h=['Category','Code','Name','Good','Bad','Total','Par','Size','Material','Location','Notes'];
+  const q=s=>`"${String(s??'').replace(/"/g,'""')}"`;
+  const csv=[h.join(',')].concat(items.filter(i=>i.qty>0||i.cat==='signal').map(i=>[i.cat,i.code,i.name,i.good,i.bad,i.qty,i.par,i.size,i.mat,i.loc,i.notes].map(q).join(','))).join('\n');
+  $('#sheet').innerHTML=`<h3>Export to Excel (CSV)</h3><p class="sub" style="white-space:normal">Includes every signal flag plus national flags you hold, with good, bad and total counts. Save the file and open it in Excel, Numbers or Google Sheets, or copy the text.</p><textarea id="csv" rows="9" readonly>${esc(csv)}</textarea><div class="acts"><button id="f-x">Close</button><button id="cp">Copy</button><button class="pri" id="dl">Save .csv file</button></div>`;
+  $('#sbg').classList.add('show');$('#f-x').onclick=closeSheet;
+  $('#dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download='flag-inventory-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();$('#dl').textContent='Saved'}catch(e){$('#dl').textContent='Save failed \u2013 use Copy'}};
+  $('#cp').onclick=async()=>{const t=$('#csv');t.select();try{await navigator.clipboard.writeText(csv);$('#cp').textContent='Copied'}catch(e){document.execCommand&&document.execCommand('copy');$('#cp').textContent='Selected'}};
+};
+render();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
